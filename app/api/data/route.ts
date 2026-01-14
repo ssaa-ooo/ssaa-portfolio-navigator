@@ -16,23 +16,27 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
     
-    // 1. 現状の評価取得
+    // 1. プロジェクト評価データの取得
     const evalSheet = doc.sheetsByTitle['Evaluations'];
     const evalRows = await evalSheet.getRows();
     const projects = evalRows.map(row => ({
-      id: row.get('ProjectID'), name: row.get('ProjectName'),
+      id: row.get('ProjectID'), 
+      name: row.get('ProjectName'),
       ssV: Number(row.get('SS_Vision') || 0), ssR: Number(row.get('SS_Resonance') || 0), ssC: Number(row.get('SS_Context') || 0),
       vvM: Number(row.get('VV_Market') || 0), vvS: Number(row.get('VV_Speed') || 0), vvF: Number(row.get('VV_Friction') || 0),
-      z: Number(row.get('Asset_Volume') || 50), lead: row.get('Lead_Person') || "未割当"
+      z: Number(row.get('Asset_Volume') || 50), 
+      lead: row.get('Lead_Person') || "未割当",
+      status: row.get('Status') || "Green",
+      insight: row.get('SSAA_Insight') || ""
     }));
 
-    // 2. 設定取得
+    // 2. 設定（北極星・定義）の取得
     const settingsSheet = doc.sheetsByTitle['Settings'];
     const settingsRows = await settingsSheet.getRows();
     const settings: any = {};
     settingsRows.forEach(row => { settings[row.get('Key')] = row.get('Value'); });
 
-    // 3. 履歴取得（軌跡用）
+    // 3. 履歴（軌跡用）の取得
     const historySheet = doc.sheetsByTitle['History'];
     const historyRows = await historySheet.getRows();
     const historyMap: any = {};
@@ -45,18 +49,20 @@ export async function GET() {
     });
 
     return NextResponse.json({ projects, settings, history: historyMap });
-  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
+  } catch (error: any) { 
+    return NextResponse.json({ error: error.message }, { status: 500 }); 
+  }
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const target = body.target as string;
+    const { target, id, updates } = body;
     const auth = getAuth();
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
 
-    // Snapshot保存モード
+    // Snapshot（履歴の一括保存）
     if (target === 'Snapshot') {
       const historySheet = doc.sheetsByTitle['History'];
       const evalSheet = doc.sheetsByTitle['Evaluations'];
@@ -73,19 +79,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // 通常の更新（Evaluations または Settings）
+    // 単一データの更新（Evaluations / Settings）
     const sheet = doc.sheetsByTitle[target];
     const rows = await sheet.getRows();
     const searchKey = target === 'Evaluations' ? 'ProjectID' : 'Key';
-    const row = rows.find(r => r.get(searchKey) === body.id);
-    
+    const row = rows.find(r => r.get(searchKey) === id);
     if (row) {
-      const updates = body.updates as Record<string, any>;
-      Object.entries(updates).forEach(([k, v]) => {
-        row.set(k, String(v)); // 型安全のため文字列としてセット
-      });
+      const upds = updates as Record<string, any>;
+      Object.entries(upds).forEach(([k, v]) => row.set(k, String(v)));
       await row.save();
     }
     return NextResponse.json({ success: true });
-  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
+  } catch (error: any) { 
+    return NextResponse.json({ error: error.message }, { status: 500 }); 
+  }
 }
