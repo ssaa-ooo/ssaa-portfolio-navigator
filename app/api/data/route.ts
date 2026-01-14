@@ -16,21 +16,33 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
     
+    // Evaluationsシートの取得
     const evalSheet = doc.sheetsByTitle['Evaluations'];
     const evalRows = await evalSheet.getRows();
     const projects = evalRows.map(row => ({
-      id: row.get('ProjectID'), name: row.get('ProjectName'),
-      ssV: Number(row.get('SS_Vision') || 0), ssR: Number(row.get('SS_Resonance') || 0), ssC: Number(row.get('SS_Context') || 0),
-      vvM: Number(row.get('VV_Market') || 0), vvS: Number(row.get('VV_Speed') || 0), vvF: Number(row.get('VV_Friction') || 0),
+      id: row.get('ProjectID'), // ← これが抜けているとエラーになります
+      name: row.get('ProjectName'),
+      ssV: Number(row.get('SS_Vision') || 0),
+      ssR: Number(row.get('SS_Resonance') || 0),
+      ssC: Number(row.get('SS_Context') || 0),
+      vvM: Number(row.get('VV_Market') || 0),
+      vvS: Number(row.get('VV_Speed') || 0),
+      vvF: Number(row.get('VV_Friction') || 0),
+      // フェーズ2：アセット配分用の新規項目
+      z: Number(row.get('Asset_Volume') || 50), 
+      lead: row.get('Lead_Person') || "未割当"
     }));
 
+    // Settingsシートの取得
     const settingsSheet = doc.sheetsByTitle['Settings'];
     const settingsRows = await settingsSheet.getRows();
     const settings: any = {};
     settingsRows.forEach(row => { settings[row.get('Key')] = row.get('Value'); });
 
     return NextResponse.json({ projects, settings });
-  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
+  } catch (error: any) { 
+    return NextResponse.json({ error: error.message }, { status: 500 }); 
+  }
 }
 
 export async function POST(req: Request) {
@@ -51,18 +63,14 @@ export async function POST(req: Request) {
     
     if (row) {
       Object.entries(updates).forEach(([key, value]) => { 
-        row.set(key, value); 
+        row.set(key, value as any); 
       });
       await row.save();
     } else if (target === 'Settings') {
-      // 新規行として追加する場合（型の競合を避けるためanyでキャスト）
       const newRow: any = { Key: id };
-      Object.entries(updates).forEach(([key, value]) => {
-        newRow[key] = value;
-      });
+      Object.entries(updates).forEach(([key, value]) => { newRow[key] = value; });
       await sheet.addRow(newRow);
     }
-
     return NextResponse.json({ success: true });
   } catch (error: any) { 
     return NextResponse.json({ error: error.message }, { status: 500 }); 
