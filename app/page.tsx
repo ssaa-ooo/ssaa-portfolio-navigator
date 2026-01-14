@@ -111,19 +111,19 @@ export default function SSAANavigator() {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-900 leading-relaxed overflow-x-hidden">
       
-      {/* Step Checklist Modal */}
+      {/* Step Modal */}
       {selectedStep !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedStep(null)} />
           <div className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 animate-in zoom-in-95 duration-300">
-            <button onClick={() => setSelectedStep(null)} className="absolute top-8 right-8 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all shadow-sm"><X className="w-6 h-6 text-slate-400" /></button>
+            <button onClick={() => setSelectedStep(null)} className="absolute top-8 right-8 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all"><X className="w-6 h-6 text-slate-400" /></button>
             <div className="mb-8 font-black">
               <h3 className="text-3xl text-slate-800 tracking-tight">{agendaDetails[selectedStep].title}</h3>
               <p className="text-slate-400 text-sm italic">{agendaDetails[selectedStep].subtitle}</p>
             </div>
             <div className="space-y-3">
               {agendaDetails[selectedStep].checklists.map((item, i) => (
-                <div key={i} className="flex gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 group hover:border-blue-300 transition-all">
+                <div key={i} className="flex gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 group">
                   <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white flex-shrink-0" />
                   <p className="text-sm font-bold text-slate-600">{item}</p>
                 </div>
@@ -133,8 +133,8 @@ export default function SSAANavigator() {
         </div>
       )}
 
-      <header className="max-w-7xl mx-auto mb-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <header className="max-w-7xl mx-auto mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
           <div>
             <h1 className="text-4xl font-black tracking-tighter text-slate-800 uppercase italic flex items-center gap-3">SSAA Navigator <Target className="w-8 h-8 text-blue-600" /></h1>
             <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase tracking-widest">Judgment Prism Console</p>
@@ -145,27 +145,27 @@ export default function SSAANavigator() {
           </div>
         </div>
 
-        {/* Vision Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 to-indigo-900 rounded-[3rem] p-10 text-white shadow-2xl">
+        {/* --- スリム化された北極星セクション --- */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-[2rem] py-5 px-8 text-white shadow-xl border border-white/5">
           {!isEditingVision ? (
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-8">
-                <div className="p-5 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/20 shadow-inner">
-                  <Compass className="w-12 h-12 text-blue-100" />
+            <div className="relative z-10 flex items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="p-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-inner">
+                  <Compass className="w-8 h-8 text-blue-200" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-2 opacity-60 font-black text-[10px] uppercase tracking-[0.4em]"><Star className="w-3 h-3 text-yellow-400 fill-yellow-400" /> North Star</div>
-                  <h2 className="text-2xl md:text-3xl font-black italic tracking-tight leading-tight">「{settings.Vision_Statement || "ビジョンを定義してください"}」</h2>
+                  <div className="flex items-center gap-2 mb-1 opacity-50 font-black text-[9px] uppercase tracking-[0.3em]"><Star className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" /> North Star</div>
+                  <h2 className="text-xl md:text-2xl font-black italic tracking-tight leading-tight">「{settings.Vision_Statement || "ビジョンを定義してください"}」</h2>
                 </div>
               </div>
-              <button onClick={() => setIsEditingVision(true)} className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 text-sm font-bold flex items-center gap-2"><Edit3 className="w-4 h-4" /> Edit</button>
+              <button onClick={() => setIsEditingVision(true)} className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all"><Edit3 className="w-3.5 h-3.5" /> Edit</button>
             </div>
           ) : (
-            <div className="relative z-10">
-              <textarea value={tempVision} onChange={(e) => setTempVision(e.target.value)} className="w-full bg-white/10 border-2 border-white/20 rounded-3xl p-6 text-xl font-bold outline-none mb-6 min-h-[120px]" />
-              <div className="flex gap-3">
-                <button onClick={() => saveSetting('Vision_Statement', tempVision)} className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black">Save Vision</button>
-                <button onClick={() => setIsEditingVision(false)} className="px-8 py-4 bg-transparent border border-white/20 rounded-2xl font-black">Cancel</button>
+            <div className="relative z-10 py-2">
+              <textarea value={tempVision} onChange={(e) => setTempVision(e.target.value)} className="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-lg font-bold outline-none mb-4 min-h-[80px] focus:border-blue-500 transition-all" placeholder="ここにビジョンを入力してください..." />
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => setIsEditingVision(false)} className="px-6 py-2 bg-transparent border border-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">Cancel</button>
+                <button onClick={() => saveSetting('Vision_Statement', tempVision)} disabled={isSaving} className="px-6 py-2 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all">Save Vision</button>
               </div>
             </div>
           )}
@@ -173,6 +173,7 @@ export default function SSAANavigator() {
       </header>
 
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* Left Section (Orbit) */}
         <div className="lg:col-span-7 space-y-8">
           <div className="bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-sm h-[550px] relative overflow-hidden group">
             <h2 className="text-2xl font-black mb-10 text-slate-800 flex items-center gap-3 relative z-10"><Gavel className="w-6 h-6 text-blue-600" /> Momentum Orbit</h2>
@@ -223,22 +224,23 @@ export default function SSAANavigator() {
              <div className="grid grid-cols-2 gap-8 relative z-10">
                 <div onMouseEnter={() => setHoveredFramework('Keep')} onMouseLeave={() => setHoveredFramework(null)} className={`space-y-4 p-6 rounded-3xl border transition-all cursor-pointer ${hoveredFramework === 'Keep' ? 'bg-white/5 border-green-500/50 scale-[1.02]' : 'border-white/5'}`}>
                   <div className="flex justify-between items-center border-b border-white/10 pb-2"><div className="text-green-400 font-black text-[10px] uppercase">Keep: 継続・拡張</div><div className="bg-green-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{counts.keep} PJ</div></div>
-                  <p className="text-[11px] text-slate-400 font-medium">反応が加速し、現場の行動密度が高い状態。リソースを維持・追加し、仕組み化を急ぐ。</p>
+                  <p className="text-[11px] text-slate-400">ROIが高く、期限内でのビジョン到達が確実視されるプロジェクト。</p>
                 </div>
                 <div onMouseEnter={() => setHoveredFramework('Exit')} onMouseLeave={() => setHoveredFramework(null)} className={`space-y-4 p-6 rounded-3xl border transition-all cursor-pointer ${hoveredFramework === 'Exit' ? 'bg-white/5 border-red-500/50 scale-[1.02]' : 'border-white/5'}`}>
                   <div className="flex justify-between items-center border-b border-white/10 pb-2"><div className="text-red-400 font-black text-[10px] uppercase">Exit: 撤退・回収</div><div className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{counts.exit} PJ</div></div>
-                  <p className="text-[11px] text-slate-400 font-medium">3ヶ月連続で速度が横ばい・低下。感情を排し、この事業から資源を他へ移転する。</p>
+                  <p className="text-[11px] text-slate-400">3ヶ月連続で速度が改善せず、投資効率が基準を下回るもの。</p>
                 </div>
              </div>
           </div>
         </div>
 
+        {/* Right Section (Cards) */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 border border-white/10 flex items-center justify-between">
             <h3 className="text-xs font-black uppercase tracking-widest flex items-center gap-2"><ListChecks className="w-4 h-4" /> Steering Agenda</h3>
             <div className="flex gap-2">
               {agendaDetails.map((_, i) => (
-                <button key={i} onClick={() => setSelectedStep(i)} className="w-8 h-8 rounded-full bg-white/20 text-[10px] font-black flex items-center justify-center hover:bg-white/40 border border-white/10 transition-all">0{i+1}</button>
+                <button key={i} onClick={() => setSelectedStep(i)} className="w-8 h-8 rounded-full bg-white/20 text-[10px] font-black flex items-center justify-center hover:bg-white/40 transition-all border border-white/10">0{i+1}</button>
               ))}
             </div>
           </div>
@@ -269,19 +271,19 @@ export default function SSAANavigator() {
 
                 {editingId === p.id ? (
                   <div className="pt-4 border-t border-slate-50 space-y-6 animate-in fade-in duration-300">
-                    {/* 1. スコア設定 (日本語化) */}
+                    {/* 1. スコア設定 (日本語) */}
                     <div className="grid grid-cols-2 gap-x-6">
                       <div>
                         <p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Strategic Sync</p>
-                        {renderSlider('ビジョン同期 (V)', 'ssV')}
-                        {renderSlider('現場共感 (R)', 'ssR')}
-                        {renderSlider('文脈適合 (C)', 'ssC')}
+                        {renderSlider('ビジョン同期', 'ssV')}
+                        {renderSlider('現場共感', 'ssR')}
+                        {renderSlider('文脈適合', 'ssC')}
                       </div>
                       <div>
                         <p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Value Velocity</p>
-                        {renderSlider('市場反応 (M)', 'vvM')}
-                        {renderSlider('開発速度 (S)', 'vvS')}
-                        {renderSlider('摩擦解消 (F)', 'vvF')}
+                        {renderSlider('市場反応', 'vvM')}
+                        {renderSlider('開発速度', 'vvS')}
+                        {renderSlider('摩擦解消', 'vvF')}
                       </div>
                     </div>
                     
@@ -291,9 +293,8 @@ export default function SSAANavigator() {
                        <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">主担当 (Lead Person)</label><input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
                     </div>
 
-                    {/* 3. 業績管理セクション（黒背景・日本語化） */}
+                    {/* 3. 業績管理 */}
                     <div className="bg-slate-900 rounded-[2.5rem] p-6 space-y-6 text-white shadow-2xl relative border border-white/5">
-                      {/* 売上 */}
                       <div className="space-y-3">
                         <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><BarChart3 className="w-3 h-3" /> 売上管理 (月次)</p>
                         <div className="grid grid-cols-2 gap-4">
@@ -302,13 +303,12 @@ export default function SSAANavigator() {
                             <input type="number" value={tempScores.tRev} onChange={e => setTempScores({...tempScores, tRev: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                           <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
-                            <label className="text-[8px] font-black text-blue-400 uppercase block mb-1">売上実績 (Actual)</label>
+                            <label className="text-[8px] font-black text-blue-400 uppercase block mb-1">実績売上 (Actual)</label>
                             <input type="number" value={tempScores.aRev} onChange={e => setTempScores({...tempScores, aRev: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                         </div>
                       </div>
 
-                      {/* 利益 */}
                       <div className="space-y-3">
                         <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><Coins className="w-3 h-3" /> 利益管理 (月次)</p>
                         <div className="grid grid-cols-2 gap-4">
@@ -317,13 +317,12 @@ export default function SSAANavigator() {
                             <input type="number" value={tempScores.tProf} onChange={e => setTempScores({...tempScores, tProf: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                           <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
-                            <label className="text-[8px] font-black text-emerald-400 uppercase block mb-1">利益実績 (Actual)</label>
+                            <label className="text-[8px] font-black text-emerald-400 uppercase block mb-1">実績利益 (Actual)</label>
                             <input type="number" value={tempScores.aProf} onChange={e => setTempScores({...tempScores, aProf: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                         </div>
                       </div>
 
-                      {/* KPI管理 */}
                       <div className="space-y-3">
                         <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><LayoutDashboard className="w-3 h-3" /> KPI管理</p>
                         <div className="bg-white/5 p-3 rounded-2xl mb-2">
@@ -342,7 +341,6 @@ export default function SSAANavigator() {
                         </div>
                       </div>
 
-                      {/* 審判期限 */}
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
                         <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">審判期限 (Deadline)</label><input type="date" value={tempScores.decisionDate} onChange={e => setTempScores({...tempScores, decisionDate: e.target.value})} className="w-full bg-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none border-none" /></div>
                         <div><label className="text-[8px] font-black text-blue-400 uppercase block mb-1 tracking-widest">最終審判 (Verdict)</label><select value={tempScores.verdict} onChange={e => setTempScores({...tempScores, verdict: e.target.value})} className="w-full bg-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none border-none focus:ring-0"><option value="Pending">Pending</option><option value="Scale-up">Scale-up</option><option value="Exit">Exit</option><option value="Archived">Archived</option></select></div>
@@ -357,10 +355,10 @@ export default function SSAANavigator() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {/* 非編集時の表示セクション */}
+                    {/* 非編集時の表示 */}
                     <div className="grid grid-cols-2 gap-3 border-t pt-4 border-slate-50">
                       <div className="p-4 bg-slate-50 rounded-3xl">
-                        <div className="flex justify-between items-center mb-2 font-black"><span className="text-[9px] text-slate-400 uppercase tracking-widest">売上進捗</span><span className="text-[10px] text-blue-600">{p.tRev > 0 ? Math.round((p.aRev / p.tRev) * 100) : 0}%</span></div>
+                        <div className="flex justify-between items-center mb-2 font-black"><span className="text-[9px] text-slate-400 uppercase tracking-widest">売上達成率</span><span className="text-[10px] text-blue-600">{p.tRev > 0 ? Math.round((p.aRev / p.tRev) * 100) : 0}%</span></div>
                         <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden mb-2"><div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((p.aRev / (p.tRev || 1)) * 100, 100)}%` }} /></div>
                         <p className="text-sm font-black text-slate-800 tracking-tight leading-none mt-1">¥{p.aRev.toLocaleString()}</p>
                       </div>
