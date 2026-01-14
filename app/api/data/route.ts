@@ -16,7 +16,6 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
     
-    // 1. プロジェクトデータ取得
     const evalSheet = doc.sheetsByTitle['Evaluations'];
     const evalRows = await evalSheet.getRows();
     const projects = evalRows.map(row => ({
@@ -28,23 +27,22 @@ export async function GET() {
       lead: row.get('Lead_Person') || "未割当",
       status: row.get('Status') || "Green",
       insight: row.get('SSAA_Insight') || "",
-      // 財務・KPI項目
       tRev: Number(row.get('Target_Revenue') || 0),
       aRev: Number(row.get('Actual_Revenue') || 0),
       tProf: Number(row.get('Target_Profit') || 0),
       aProf: Number(row.get('Actual_Profit') || 0),
       kpiName: row.get('KPI_Name') || "KPI未設定",
       kpiT: Number(row.get('KPI_Target') || 0),
-      kpiA: Number(row.get('KPI_Actual') || 0)
+      kpiA: Number(row.get('KPI_Actual') || 0),
+      decisionDate: row.get('Decision_Date') || "",
+      verdict: row.get('Verdict') || "Pending"
     }));
 
-    // 2. 設定取得
     const settingsSheet = doc.sheetsByTitle['Settings'];
     const settingsRows = await settingsSheet.getRows();
     const settings: any = {};
     settingsRows.forEach(row => { settings[row.get('Key')] = row.get('Value'); });
 
-    // 3. 履歴（軌跡）取得
     const historySheet = doc.sheetsByTitle['History'];
     const historyRows = await historySheet.getRows();
     const historyMap: any = {};
@@ -86,7 +84,8 @@ export async function POST(req: Request) {
 
     const sheet = doc.sheetsByTitle[target];
     const rows = await sheet.getRows();
-    const row = rows.find(r => r.get(target === 'Evaluations' ? 'ProjectID' : 'Key') === id);
+    const searchKey = target === 'Evaluations' ? 'ProjectID' : 'Key';
+    const row = rows.find(r => r.get(searchKey) === id);
     if (row) {
       Object.entries(updates).forEach(([k, v]) => row.set(k, String(v)));
       await row.save();
