@@ -35,7 +35,6 @@ export default function SSAANavigator() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // 設定（ビジョンなど）を保存する関数
   const saveSetting = async (key: string, value: string) => {
     setIsSaving(true);
     try {
@@ -49,7 +48,6 @@ export default function SSAANavigator() {
     } catch (err) { alert("保存失敗"); } finally { setIsSaving(false); }
   };
 
-  // プロジェクト評価を保存する関数
   const saveEvaluation = async (id: string) => {
     setIsSaving(true);
     try {
@@ -75,7 +73,7 @@ export default function SSAANavigator() {
     setIsSaving(true);
     try {
       await fetch('/api/data', { method: 'POST', body: JSON.stringify({ target: 'Snapshot' }) });
-      alert("Snapshotを保存しました。履歴との比較が可能になります。");
+      alert("Snapshotを保存しました。");
       await fetchData();
     } catch (err) { alert("保存失敗"); } finally { setIsSaving(false); }
   };
@@ -97,21 +95,21 @@ export default function SSAANavigator() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
             <h1 className="text-4xl font-black tracking-tighter text-slate-800 uppercase italic">SSAA Navigator</h1>
-            <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase">Phase 3: Agile Steering</p>
+            <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase tracking-widest text-slate-400">Phase 3: Agile Steering</p>
           </div>
           <div className="flex gap-3">
             <button onClick={takeSnapshot} disabled={isSaving} className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
               <Camera className="w-4 h-4" />
               <span className="font-bold text-xs uppercase tracking-widest text-slate-700">Snapshot</span>
             </button>
-            <button onClick={fetchData} className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-black transition-all active:scale-95">
+            <button onClick={fetchData} className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-black transition-all">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               <span className="font-bold text-xs uppercase tracking-widest text-white">Sync Now</span>
             </button>
           </div>
         </div>
 
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 to-blue-900 rounded-[3rem] p-10 text-white shadow-2xl">
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 rounded-[3rem] p-10 text-white shadow-2xl">
           {!isEditingVision ? (
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 animate-in fade-in duration-700">
               <div className="flex items-center gap-8">
@@ -127,11 +125,10 @@ export default function SSAANavigator() {
             </div>
           ) : (
             <div className="relative z-10 animate-in slide-in-from-top-4 duration-500">
-              <div className="flex items-center gap-3 mb-6"><Lightbulb className="w-6 h-6 text-yellow-400" /><h3 className="font-black text-xl tracking-tight">Vision Crafting</h3></div>
-              <textarea value={tempVision} onChange={(e) => setTempVision(e.target.value)} className="w-full bg-white/10 border-2 border-white/20 rounded-3xl p-6 text-xl font-bold outline-none mb-6 min-h-[120px] focus:border-white/50 transition-all" />
+              <textarea value={tempVision} onChange={(e) => setTempVision(e.target.value)} className="w-full bg-white/10 border-2 border-white/20 rounded-3xl p-6 text-xl font-bold outline-none mb-6 min-h-[120px]" />
               <div className="flex gap-3">
-                <button onClick={() => saveSetting('Vision_Statement', tempVision)} disabled={isSaving} className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black hover:bg-blue-50 transition-all">Save Vision</button>
-                <button onClick={() => setIsEditingVision(false)} className="px-8 py-4 bg-transparent border border-white/20 rounded-2xl font-black hover:bg-white/10 transition-all">Cancel</button>
+                <button onClick={() => saveSetting('Vision_Statement', tempVision)} className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black">Save Vision</button>
+                <button onClick={() => setIsEditingVision(false)} className="px-8 py-4 bg-transparent border border-white/20 rounded-2xl font-black">Cancel</button>
               </div>
             </div>
           )}
@@ -140,10 +137,16 @@ export default function SSAANavigator() {
 
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-7 bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm h-[650px] relative overflow-hidden">
-          <h2 className="text-2xl font-black mb-10 text-slate-800 flex items-center gap-3 relative z-10">
-            <div className="p-2 bg-blue-50 rounded-xl"><TrendingUp className="w-6 h-6 text-blue-600" /></div>
-            Momentum Orbit
-          </h2>
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
+              <div className="p-2 bg-blue-50 rounded-xl"><TrendingUp className="w-6 h-6 text-blue-600" /></div>
+              Momentum Orbit
+            </h2>
+            <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-slate-200"></div> Previous</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-blue-600"></div> Current</div>
+            </div>
+          </div>
           
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 0, right: 20, bottom: 40, left: 0 }}>
@@ -154,22 +157,40 @@ export default function SSAANavigator() {
               <ReferenceLine x={60} stroke="#cbd5e1" strokeDasharray="8 8" />
               <ReferenceLine y={60} stroke="#cbd5e1" strokeDasharray="8 8" />
               
+              {/* 1. レイヤー最下層：軌跡（点線）を描画 */}
               {data.map((p) => {
                 const prev = history[p.id];
-                if (!prev) return null;
-                return (
-                  <ReferenceLine key={`trail-${p.id}`} segment={[{ x: prev.x, y: prev.y }, { x: p.x, y: p.y }]} stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 5" />
-                );
+                if (prev && (prev.x !== p.x || prev.y !== p.y)) {
+                  return (
+                    <ReferenceLine 
+                      key={`trail-${p.id}`} 
+                      segment={[{ x: prev.x, y: prev.y }, { x: p.x, y: p.y }]} 
+                      stroke="#cbd5e1" 
+                      strokeWidth={2} 
+                      strokeDasharray="5 5"
+                    />
+                  );
+                }
+                return null;
               })}
 
+              {/* 2. 中間レイヤー：過去の位置（残像ドット） */}
+              <Scatter name="Previous" data={Object.keys(history).map(id => ({ id, ...history[id], z: 30 }))}>
+                {Object.keys(history).map((id) => (
+                  <Cell key={`prev-${id}`} fill="#e2e8f0" fillOpacity={0.5} />
+                ))}
+              </Scatter>
+
+              {/* 3. 最前面レイヤー：現在の位置（鮮やかなドット） */}
               <Scatter name="Current" data={data}>
                 {data.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 
                     fill={entry.x >= 60 && entry.y >= 60 ? '#2563eb' : entry.x < 40 && entry.y < 40 ? '#f43f5e' : '#f59e0b'} 
-                    fillOpacity={0.7}
+                    fillOpacity={0.85}
                     stroke={entry.x >= 60 && entry.z < 50 ? '#fbbf24' : 'none'}
                     strokeWidth={4}
+                    style={{ transition: 'all 0.5s ease' }}
                   />
                 ))}
               </Scatter>
@@ -190,17 +211,17 @@ export default function SSAANavigator() {
                   </div>
                 </div>
                 {editingId !== p.id ? (
-                  <button onClick={() => { setEditingId(p.id); setTempScores({...p}); }} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-blue-600 hover:text-white transition-all"><Settings2 className="w-5 h-5" /></button>
+                  <button onClick={() => { setEditingId(p.id); setTempScores({...p}); }} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"><Settings2 className="w-5 h-5" /></button>
                 ) : (
                   <div className="flex gap-2">
-                    <button onClick={() => saveEvaluation(p.id)} disabled={isSaving} className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg"><Save className="w-5 h-5" /></button>
+                    <button onClick={() => saveEvaluation(p.id)} disabled={isSaving} className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200"><Save className="w-5 h-5" /></button>
                     <button onClick={() => setEditingId(null)} className="p-3 bg-white border border-slate-200 text-slate-400 rounded-2xl"><X className="w-5 h-5" /></button>
                   </div>
                 )}
               </div>
 
               {editingId === p.id ? (
-                <div className="pt-6 border-t border-slate-50 space-y-4 animate-in fade-in duration-300">
+                <div className="pt-6 border-t border-slate-50 space-y-4">
                   <div className="grid grid-cols-2 gap-x-8">
                     <div>{renderSlider('Vision', 'ssV')}{renderSlider('Resonance', 'ssR')}{renderSlider('Context', 'ssC')}</div>
                     <div>{renderSlider('Market', 'vvM')}{renderSlider('Speed', 'vvS')}{renderSlider('Friction', 'vvF')}</div>
@@ -208,16 +229,16 @@ export default function SSAANavigator() {
                   <div className="bg-slate-50 p-6 rounded-3xl space-y-4 shadow-inner">
                     {renderSlider('Asset Volume', 'z', 10, 200)}
                     <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Lead Person</label>
-                      <input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-400 transition-all" />
+                      <label className="text-[10px] font-black text-slate-400 uppercase block mb-2 tracking-widest text-slate-400">Lead Person</label>
+                      <input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-blue-400 transition-all shadow-sm" />
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="flex justify-between items-end border-t pt-4 border-slate-50">
-                  <div className="flex gap-6">
-                    <div><p className="text-[9px] font-black text-slate-300 uppercase mb-1 tracking-tighter">Sync</p><p className="text-xl font-black text-slate-700">{Math.round(p.x)}%</p></div>
-                    <div><p className="text-[9px] font-black text-slate-300 uppercase mb-1 tracking-tighter">Velocity</p><p className="text-xl font-black text-slate-700">{Math.round(p.y)}%</p></div>
+                  <div className="flex gap-6 text-slate-600">
+                    <div><p className="text-[9px] font-black text-slate-300 uppercase mb-1 tracking-tighter">Sync</p><p className="text-xl font-black">{Math.round(p.x)}%</p></div>
+                    <div><p className="text-[9px] font-black text-slate-300 uppercase mb-1 tracking-tighter">Velocity</p><p className="text-xl font-black">{Math.round(p.y)}%</p></div>
                   </div>
                   <div className="text-right">
                     <p className="text-[9px] font-black text-slate-300 uppercase mb-1 tracking-tighter">Asset Harmony</p>
