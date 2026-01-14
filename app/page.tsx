@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
-import { Settings2, RefreshCw, Save, X, Compass, Star, Edit3, Users, Camera, TrendingUp, AlertCircle, MessageSquare, ListChecks, Target, Clock, Info, ShieldCheck, BarChart3, TrendingDown } from 'lucide-react';
+import { Settings2, RefreshCw, Save, X, Compass, Star, Edit3, Users, Camera, TrendingUp, AlertCircle, MessageSquare, ListChecks, Target, Clock, Info, ShieldCheck, BarChart3, Coins, LayoutDashboard } from 'lucide-react';
 
 export default function SSAANavigator() {
   const [data, setData] = useState<any[]>([]);
@@ -12,8 +12,6 @@ export default function SSAANavigator() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempScores, setTempScores] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isEditingVision, setIsEditingVision] = useState(false);
-  const [tempVision, setTempVision] = useState("");
   const [selectedStep, setSelectedStep] = useState<number | null>(null);
   const [hoveredFramework, setHoveredFramework] = useState<string | null>(null);
 
@@ -40,7 +38,6 @@ export default function SSAANavigator() {
       setData(processed);
       setSettings(json.settings || {});
       setHistory(json.history || {});
-      setTempVision(json.settings?.Vision_Statement || "");
     } catch (err) { console.error(err); } finally { setLoading(false); }
   };
 
@@ -59,7 +56,8 @@ export default function SSAANavigator() {
             'VV_Market': tempScores.vvM, 'VV_Speed': tempScores.vvS, 'VV_Friction': tempScores.vvF,
             'Work_Hours': tempScores.hours, 'Lead_Person': tempScores.lead,
             'Status': tempScores.status, 'SSAA_Insight': tempScores.insight,
-            'Target_Revenue': tempScores.tRev, 'Actual_Revenue': tempScores.aRev, 'Actual_Profit': tempScores.aProf,
+            'Target_Revenue': tempScores.tRev, 'Actual_Revenue': tempScores.aRev, 
+            'Target_Profit': tempScores.tProf, 'Actual_Profit': tempScores.aProf,
             'KPI_Name': tempScores.kpiName, 'KPI_Target': tempScores.kpiT, 'KPI_Actual': tempScores.kpiA
           }
         }),
@@ -76,7 +74,6 @@ export default function SSAANavigator() {
         <span className="text-blue-600 font-bold">{tempScores[key]}/5</span>
       </div>
       <input type="range" min="1" max="5" value={tempScores[key]} onChange={e => setTempScores({...tempScores, [key]: parseInt(e.target.value)})} className="w-full h-1 bg-slate-100 rounded-full appearance-none cursor-pointer accent-blue-600" />
-      <p className="text-[8px] text-blue-400 font-bold italic mt-1">{settings[`Score_${tempScores[key]}_Def`]}</p>
     </div>
   );
 
@@ -85,7 +82,7 @@ export default function SSAANavigator() {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-900 leading-relaxed overflow-x-hidden">
       
-      {/* Step Modal */}
+      {/* Step Checklist Modal */}
       {selectedStep !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedStep(null)} />
@@ -110,16 +107,16 @@ export default function SSAANavigator() {
       <header className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black tracking-tighter text-slate-800 uppercase italic flex items-center gap-3">SSAA Navigator <Target className="w-8 h-8 text-blue-600" /></h1>
-          <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase tracking-widest">Performance Reporting Enabled</p>
+          <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase tracking-widest">Agile Steering Mode</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => alert("Snapshot saved.")} className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 hover:shadow-md transition-all"><Camera className="w-4 h-4" /> Snapshot</button>
-          <button onClick={fetchData} className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-lg hover:bg-black transition-all"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Sync Now</button>
+          <button onClick={() => fetchData()} className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-lg hover:bg-black transition-all"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Sync Now</button>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-7 space-y-8">
+          {/* Chart Section */}
           <div className="bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-sm h-[550px] relative overflow-hidden group">
             <h2 className="text-2xl font-black mb-10 text-slate-800 flex items-center gap-3 relative z-10"><TrendingUp className="w-6 h-6 text-blue-600" /> Momentum Orbit</h2>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] font-black text-6xl uppercase select-none group-hover:opacity-[0.05] transition-all duration-1000">
@@ -154,12 +151,13 @@ export default function SSAANavigator() {
                     />
                   ))}
                 </Scatter>
-                <Tooltip />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
           
-          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden transition-all">
+          {/* Framework Analysis Footer */}
+          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden transition-all border border-white/5">
              <div className="absolute top-0 right-0 p-8 opacity-5"><ShieldCheck className="w-32 h-32" /></div>
              <h3 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] mb-6 text-blue-400"><AlertCircle className="w-4 h-4" /> Selection Framework Analysis</h3>
              <div className="grid grid-cols-2 gap-8 relative z-10">
@@ -176,8 +174,8 @@ export default function SSAANavigator() {
         </div>
 
         <div className="lg:col-span-5 space-y-6">
-          {/* Agenda */}
-          <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100">
+          {/* Agenda Section */}
+          <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 border border-white/10">
             <h3 className="text-xs font-black uppercase tracking-widest flex items-center gap-2 mb-6"><ListChecks className="w-4 h-4" /> Steering Agenda</h3>
             <div className="space-y-2">
               {agendaDetails.map((item, idx) => (
@@ -189,6 +187,7 @@ export default function SSAANavigator() {
             </div>
           </div>
 
+          {/* Project List */}
           <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
             {data.map((p) => (
               <div key={p.id} className={`p-6 rounded-[2.5rem] border bg-white transition-all duration-300 ${editingId === p.id ? 'border-blue-500 shadow-2xl scale-[1.02]' : 'border-slate-100 shadow-sm'}`}>
@@ -201,52 +200,87 @@ export default function SSAANavigator() {
                     <button onClick={() => { setEditingId(p.id); setTempScores({...p}); }} className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-900 hover:text-white transition-all shadow-sm"><Settings2 className="w-5 h-5" /></button>
                   ) : (
                     <div className="flex gap-2">
-                      <button onClick={() => saveEvaluation(p.id)} className="p-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200"><Save className="w-5 h-5" /></button>
+                      <button onClick={() => saveEvaluation(p.id)} className="p-2 bg-blue-600 text-white rounded-xl shadow-lg"><Save className="w-5 h-5" /></button>
                       <button onClick={() => setEditingId(null)} className="p-2 bg-white border border-slate-200 text-slate-400 rounded-xl"><X className="w-5 h-5" /></button>
                     </div>
                   )}
                 </div>
 
                 {editingId === p.id ? (
-                  <div className="pt-4 border-t border-slate-50 space-y-4">
-                    {/* Scoring Section */}
+                  <div className="pt-4 border-t border-slate-50 space-y-4 animate-in fade-in">
                     <div className="grid grid-cols-2 gap-x-6">
-                      <div><p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1">Strategic Sync</p>{['ssV', 'ssR', 'ssC'].map(k => renderSlider(k.replace('ss', ''), k))}</div>
-                      <div><p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1">Value Velocity</p>{['vvM', 'vvS', 'vvF'].map(k => renderSlider(k.replace('vv', ''), k))}</div>
+                      <div><p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Strategic Sync</p>{['ssV', 'ssR', 'ssC'].map(k => renderSlider(k.replace('ss', ''), k))}</div>
+                      <div><p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Value Velocity</p>{['vvM', 'vvS', 'vvF'].map(k => renderSlider(k.replace('vv', ''), k))}</div>
                     </div>
                     
-                    {/* Reporting Input Section */}
-                    <div className="bg-slate-900 rounded-[2.5rem] p-6 space-y-4 shadow-inner text-white">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div><label className="text-[8px] font-black text-slate-400 uppercase block mb-1">Target Revenue</label><input type="number" value={tempScores.tRev} onChange={e => setTempScores({...tempScores, tRev: parseInt(e.target.value) || 0})} className="w-full bg-white/10 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none focus:border-blue-400" /></div>
-                        <div><label className="text-[8px] font-black text-slate-400 uppercase block mb-1">Actual Revenue</label><input type="number" value={tempScores.aRev} onChange={e => setTempScores({...tempScores, aRev: parseInt(e.target.value) || 0})} className="w-full bg-white/10 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none focus:border-blue-400" /></div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div><label className="text-[8px] font-black text-slate-400 uppercase block mb-1">Work Hours</label><input type="number" value={tempScores.hours} onChange={e => setTempScores({...tempScores, hours: parseInt(e.target.value) || 0})} className="w-full bg-white/10 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
-                        <div><label className="text-[8px] font-black text-slate-400 uppercase block mb-1">Lead Person</label><input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white/10 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
-                      </div>
-                      <div className="border-t border-white/10 pt-4">
-                        <input type="text" value={tempScores.kpiName} onChange={e => setTempScores({...tempScores, kpiName: e.target.value})} className="bg-transparent border-none p-0 text-[10px] font-black text-blue-400 uppercase w-full mb-2" placeholder="KPI NAME" />
+                    <div className="bg-slate-900 rounded-[2.5rem] p-6 space-y-6 shadow-2xl text-white">
+                      {/* 売上管理 */}
+                      <div className="space-y-3">
+                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1"><BarChart3 className="w-3 h-3" /> 売上管理 (月次)</p>
                         <div className="grid grid-cols-2 gap-4">
-                          <input type="number" value={tempScores.kpiT} onChange={e => setTempScores({...tempScores, kpiT: parseInt(e.target.value) || 0})} className="bg-white/10 border border-white/10 rounded-xl p-2 text-xs font-bold" placeholder="Target" />
-                          <input type="number" value={tempScores.kpiA} onChange={e => setTempScores({...tempScores, kpiA: parseInt(e.target.value) || 0})} className="bg-white/10 border border-white/10 rounded-xl p-2 text-xs font-bold" placeholder="Actual" />
+                          <div className="bg-white/5 p-3 rounded-2xl">
+                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">目標値 (Target)</label>
+                            <input type="number" value={tempScores.tRev} onChange={e => setTempScores({...tempScores, tRev: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" placeholder="¥0" />
+                          </div>
+                          <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
+                            <label className="text-[8px] font-black text-blue-400 uppercase block mb-1 tracking-widest">実績値 (Actual)</label>
+                            <input type="number" value={tempScores.aRev} onChange={e => setTempScores({...tempScores, aRev: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" placeholder="¥0" />
+                          </div>
                         </div>
                       </div>
-                      <div className="flex gap-2 pt-2">{['Green', 'Yellow', 'Red'].map(s => ( <button key={s} onClick={() => setTempScores({...tempScores, status: s})} className={`flex-1 py-2 rounded-xl text-[10px] font-black border-2 transition-all ${tempScores.status === s ? 'bg-white border-blue-500 text-blue-600' : 'bg-transparent border-white/10 text-slate-400'}`}>{s}</button>))}</div>
-                      <textarea value={tempScores.insight} onChange={e => setTempScores({...tempScores, insight: e.target.value})} className="w-full bg-white/10 border border-white/10 rounded-xl p-3 text-[10px] font-bold outline-none h-20" placeholder="SSAA Insights..." />
+
+                      {/* 利益管理 */}
+                      <div className="space-y-3">
+                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1"><Coins className="w-3 h-3" /> 利益管理 (月次)</p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-white/5 p-3 rounded-2xl">
+                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">目標値 (Target)</label>
+                            <input type="number" value={tempScores.tProf} onChange={e => setTempScores({...tempScores, tProf: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" placeholder="¥0" />
+                          </div>
+                          <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
+                            <label className="text-[8px] font-black text-emerald-400 uppercase block mb-1">実績値 (Actual)</label>
+                            <input type="number" value={tempScores.aProf} onChange={e => setTempScores({...tempScores, aProf: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" placeholder="¥0" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* KPI管理 */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 border-b border-white/10 pb-1 mb-2">
+                           <LayoutDashboard className="w-3 h-3 text-amber-400" />
+                           <input type="text" value={tempScores.kpiName} onChange={e => setTempScores({...tempScores, kpiName: e.target.value})} className="bg-transparent text-[10px] font-black text-amber-400 uppercase outline-none w-full border-none p-0 focus:ring-0" placeholder="KPI名を入力" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-white/5 p-3 rounded-2xl">
+                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">目標値 (Target)</label>
+                            <input type="number" value={tempScores.kpiT} onChange={e => setTempScores({...tempScores, kpiT: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
+                          </div>
+                          <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
+                            <label className="text-[8px] font-black text-amber-400 uppercase block mb-1">実績値 (Actual)</label>
+                            <input type="number" value={tempScores.kpiA} onChange={e => setTempScores({...tempScores, kpiA: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">Work Hours</label><input type="number" value={tempScores.hours} onChange={e => setTempScores({...tempScores, hours: parseInt(e.target.value) || 0})} className="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
+                        <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">Lead Person</label><input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
+                      </div>
+                      <div className="flex gap-2">{['Green', 'Yellow', 'Red'].map(s => ( <button key={s} onClick={() => setTempScores({...tempScores, status: s})} className={`flex-1 py-2 rounded-xl text-[10px] font-black border-2 transition-all ${tempScores.status === s ? 'bg-white border-blue-500 text-blue-600' : 'bg-transparent border-white/10 text-slate-400'}`}>{s}</button>))}</div>
+                      <textarea value={tempScores.insight} onChange={e => setTempScores({...tempScores, insight: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-[10px] font-bold outline-none h-20" placeholder="SSAA Insights..." />
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {/* Performance Summary Section */}
+                    {/* Display Summary */}
                     <div className="grid grid-cols-2 gap-3 border-t pt-4 border-slate-50">
-                      <div className="p-4 bg-slate-50 rounded-3xl group hover:bg-white hover:shadow-inner transition-all">
+                      <div className="p-4 bg-slate-50 rounded-3xl">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><BarChart3 className="w-3 h-3" /> Revenue</span>
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><BarChart3 className="w-3 h-3" /> 売上達成率</span>
                           <span className="text-[10px] font-black text-blue-600">{p.tRev > 0 ? Math.round((p.aRev / p.tRev) * 100) : 0}%</span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden mb-2">
-                          <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((p.aRev / (p.tRev || 1)) * 100, 100)}%` }} />
+                          <div className="h-full bg-blue-500" style={{ width: `${Math.min((p.aRev / (p.tRev || 1)) * 100, 100)}%` }} />
                         </div>
                         <p className="text-sm font-black text-slate-800 tracking-tight">¥{p.aRev.toLocaleString()}</p>
                       </div>
@@ -261,15 +295,14 @@ export default function SSAANavigator() {
 
                     <div className="flex justify-between items-end">
                       <div className="flex gap-4">
-                        <div><p className="text-[8px] font-black text-slate-300 uppercase mb-1">Momentum</p><p className="text-lg font-black text-slate-700">{Math.round((p.x + p.y)/2)}%</p></div>
-                        <div><p className="text-[8px] font-black text-slate-300 uppercase mb-1">Resource</p><p className="text-lg font-black text-blue-600">{p.ratio}%</p></div>
+                        <div><p className="text-[8px] font-black text-slate-300 uppercase mb-1 tracking-widest">Momentum</p><p className="text-lg font-black text-slate-700">{Math.round((p.x + p.y)/2)}%</p></div>
+                        <div><p className="text-[8px] font-black text-slate-300 uppercase mb-1 tracking-widest">Resource</p><p className="text-lg font-black text-blue-600">{p.ratio}%</p></div>
                       </div>
                       <div className="text-right">
-                        <p className="text-[8px] font-black text-slate-300 uppercase mb-1 tracking-tighter italic">Profitability</p>
-                        <p className={`text-sm font-black ${p.aProf >= 0 ? 'text-green-600' : 'text-rose-600'}`}>¥{p.aProf.toLocaleString()}</p>
+                        <p className="text-[8px] font-black text-slate-300 uppercase mb-1 tracking-tighter italic font-bold">実績利益</p>
+                        <p className={`text-sm font-black ${p.aProf >= (p.tProf || 0) ? 'text-green-600' : 'text-rose-600'}`}>¥{p.aProf.toLocaleString()}</p>
                       </div>
                     </div>
-                    
                     {p.insight && <div className="p-4 bg-blue-50/50 rounded-2xl border-l-4 border-blue-500 shadow-sm"><p className="text-[10px] font-bold text-blue-700 italic leading-relaxed">"{p.insight}"</p></div>}
                   </div>
                 )}
