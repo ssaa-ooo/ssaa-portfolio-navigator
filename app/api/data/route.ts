@@ -16,46 +16,41 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
     
-    const evalSheet = doc.sheetsByTitle['Evaluations'];
-    const evalRows = await evalSheet.getRows();
-    const projects = evalRows.map(row => ({
-      id: row.get('ProjectID'), 
-      name: row.get('ProjectName'),
+    const rows = await doc.sheetsByTitle['Evaluations'].getRows();
+    const projects = rows.map(row => ({
+      id: row.get('ProjectID'), name: row.get('ProjectName'),
       ssV: Number(row.get('SS_Vision') || 0), ssR: Number(row.get('SS_Resonance') || 0), ssC: Number(row.get('SS_Context') || 0),
       vvM: Number(row.get('VV_Market') || 0), vvS: Number(row.get('VV_Speed') || 0), vvF: Number(row.get('VV_Friction') || 0),
-      hours: Number(row.get('Work_Hours') || 0),
-      lead: row.get('Lead_Person') || "未割当",
-      status: row.get('Status') || "Green",
-      insight: row.get('SSAA_Insight') || "",
-      tRev: Number(row.get('Target_Revenue') || 0),
-      aRev: Number(row.get('Actual_Revenue') || 0),
-      tProf: Number(row.get('Target_Profit') || 0),
-      aProf: Number(row.get('Actual_Profit') || 0),
-      kpiName: row.get('KPI_Name') || "KPI未設定",
-      kpiT: Number(row.get('KPI_Target') || 0),
-      kpiA: Number(row.get('KPI_Actual') || 0),
-      decisionDate: row.get('Decision_Date') || "",
-      verdict: row.get('Verdict') || "Pending"
+      hours: Number(row.get('Work_Hours') || 0), lead: row.get('Lead_Person') || "",
+      status: row.get('Status') || "Green", insight: row.get('SSAA_Insight') || "",
+      tRev: Number(row.get('Target_Revenue') || 0), aRev: Number(row.get('Actual_Revenue') || 0),
+      tProf: Number(row.get('Target_Profit') || 0), aProf: Number(row.get('Actual_Profit') || 0),
+      kpiName: row.get('KPI_Name') || "", kpiT: Number(row.get('KPI_Target') || 0), kpiA: Number(row.get('KPI_Actual') || 0),
+      decisionDate: row.get('Decision_Date') || "", verdict: row.get('Verdict') || "Pending"
     }));
 
-    const settingsSheet = doc.sheetsByTitle['Settings'];
-    const settingsRows = await settingsSheet.getRows();
+    const settingsRows = await doc.sheetsByTitle['Settings'].getRows();
     const settings: any = {};
     settingsRows.forEach(row => { settings[row.get('Key')] = row.get('Value'); });
 
+    const historyRows = await historySheetRows(doc);
+    return NextResponse.json({ projects, settings, history: historyRows });
+  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
+}
+
+async function historySheetRows(doc: any) {
+  try {
     const historySheet = doc.sheetsByTitle['History'];
-    const historyRows = await historySheet.getRows();
+    const rows = await historySheet.getRows();
     const historyMap: any = {};
-    historyRows.forEach(row => {
-      const pid = row.get('ProjectID');
-      historyMap[pid] = {
+    rows.forEach((row: any) => {
+      historyMap[row.get('ProjectID')] = {
         x: ((Number(row.get('SS_Vision'))*0.4)+(Number(row.get('SS_Resonance'))*0.3)+(Number(row.get('SS_Context'))*0.3))*20,
         y: ((Number(row.get('VV_Market'))*0.4)+(Number(row.get('VV_Speed'))*0.4)+(Number(row.get('VV_Friction'))*0.2))*20
       };
     });
-
-    return NextResponse.json({ projects, settings, history: historyMap });
-  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
+    return historyMap;
+  } catch { return {}; }
 }
 
 export async function POST(req: Request) {
@@ -68,12 +63,10 @@ export async function POST(req: Request) {
 
     if (target === 'Snapshot') {
       const historySheet = doc.sheetsByTitle['History'];
-      const evalSheet = doc.sheetsByTitle['Evaluations'];
-      const rows = await evalSheet.getRows();
-      const date = new Date().toLocaleDateString('ja-JP');
-      for (const row of rows) {
+      const evalRows = await doc.sheetsByTitle['Evaluations'].getRows();
+      for (const row of evalRows) {
         await historySheet.addRow({
-          Date: date, ProjectID: row.get('ProjectID'),
+          Date: new Date().toLocaleDateString('ja-JP'), ProjectID: row.get('ProjectID'),
           SS_Vision: row.get('SS_Vision'), SS_Resonance: row.get('SS_Resonance'), SS_Context: row.get('SS_Context'),
           VV_Market: row.get('VV_Market'), VV_Speed: row.get('VV_Speed'), VV_Friction: row.get('VV_Friction'),
           Work_Hours: row.get('Work_Hours'), Actual_Revenue: row.get('Actual_Revenue'), Actual_Profit: row.get('Actual_Profit')
@@ -84,8 +77,7 @@ export async function POST(req: Request) {
 
     const sheet = doc.sheetsByTitle[target];
     const rows = await sheet.getRows();
-    const searchKey = target === 'Evaluations' ? 'ProjectID' : 'Key';
-    const row = rows.find(r => r.get(searchKey) === id);
+    const row = rows.find(r => r.get(target === 'Evaluations' ? 'ProjectID' : 'Key') === id);
     if (row) {
       Object.entries(updates).forEach(([k, v]) => row.set(k, String(v)));
       await row.save();
