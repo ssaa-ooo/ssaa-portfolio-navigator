@@ -19,11 +19,18 @@ export async function GET() {
     const evalSheet = doc.sheetsByTitle['Evaluations'];
     const evalRows = await evalSheet.getRows();
     const projects = evalRows.map(row => ({
-      id: row.get('ProjectID'), name: row.get('ProjectName'),
-      ssV: Number(row.get('SS_Vision') || 0), ssR: Number(row.get('SS_Resonance') || 0), ssC: Number(row.get('SS_Context') || 0),
-      vvM: Number(row.get('VV_Market') || 0), vvS: Number(row.get('VV_Speed') || 0), vvF: Number(row.get('VV_Friction') || 0),
-      z: Number(row.get('Asset_Volume') || 50), lead: row.get('Lead_Person') || "未割当",
-      status: row.get('Status') || "Green", insight: row.get('SSAA_Insight') || ""
+      id: row.get('ProjectID'), 
+      name: row.get('ProjectName'),
+      ssV: Number(row.get('SS_Vision') || 0), 
+      ssR: Number(row.get('SS_Resonance') || 0), 
+      ssC: Number(row.get('SS_Context') || 0),
+      vvM: Number(row.get('VV_Market') || 0), 
+      vvS: Number(row.get('VV_Speed') || 0), 
+      vvF: Number(row.get('VV_Friction') || 0),
+      hours: Number(row.get('Work_Hours') || 0), // 稼働時間を取得
+      lead: row.get('Lead_Person') || "未割当",
+      status: row.get('Status') || "Green",
+      insight: row.get('SSAA_Insight') || ""
     }));
 
     const settingsSheet = doc.sheetsByTitle['Settings'];
@@ -64,7 +71,7 @@ export async function POST(req: Request) {
           Date: date, ProjectID: row.get('ProjectID'),
           SS_Vision: row.get('SS_Vision'), SS_Resonance: row.get('SS_Resonance'), SS_Context: row.get('SS_Context'),
           VV_Market: row.get('VV_Market'), VV_Speed: row.get('VV_Speed'), VV_Friction: row.get('VV_Friction'),
-          Asset_Volume: row.get('Asset_Volume')
+          Work_Hours: row.get('Work_Hours')
         });
       }
       return NextResponse.json({ success: true });
