@@ -2,26 +2,17 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { NextResponse } from 'next/server';
 
+const auth = new JWT({
+  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+// 1. データの取得 (GET)
 export async function GET() {
   try {
-    const rawKey = process.env.GOOGLE_PRIVATE_KEY;
-    if (!rawKey) throw new Error("GOOGLE_PRIVATE_KEY is missing");
-
-    // Vercel特有の「改行崩れ」を完全に修正するロジック
-    const formattedKey = rawKey
-      .replace(/\\n/g, '\n')        // 文字列としての \n を実際の改行に
-      .replace(/"/g, '')             // 万が一混入した引用符を削除
-      .trim();                       // 前後の余計な空白を削除
-
-    const serviceAccountAuth = new JWT({
-      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      key: formattedKey,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, serviceAccountAuth);
+    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
-
     const sheet = doc.sheetsByTitle['Evaluations'];
     const rows = await sheet.getRows();
 
@@ -35,10 +26,33 @@ export async function GET() {
       vvS: Number(row.get('VV_Speed') || 0),
       vvF: Number(row.get('VV_Friction') || 0),
     }));
-
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error("Critical Error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// 2. データの保存 (POST)
+export async function POST(req: Request) {
+  try {
+    const { id, updates } = await req.json();
+    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
+    await doc.loadInfo();
+    const sheet = doc.sheetsByTitle['Evaluations'];
+    const rows = await sheet.getRows();
+    
+    // ProjectIDが一致する行を探す
+    const row = rows.find(r => r.get('ProjectID') === id);
+    if (!row) throw new Error("Project not found");
+
+    // 指定されたカラムを更新
+    Object.entries(updates).forEach(([key, value]) => {
+      row.set(key, value);
+    });
+
+    await row.save(); // スプレッドシートへ書き込み
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
