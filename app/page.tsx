@@ -47,7 +47,6 @@ export default function SSAANavigator() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // ビジョン保存用
   const saveSetting = async (key: string, value: string) => {
     setIsSaving(true);
     try {
@@ -112,21 +111,21 @@ export default function SSAANavigator() {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-900 leading-relaxed overflow-x-hidden">
       
-      {/* モーダル表示 */}
+      {/* Step Checklist Modal */}
       {selectedStep !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedStep(null)} />
           <div className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 animate-in zoom-in-95 duration-300">
-            <button onClick={() => setSelectedStep(null)} className="absolute top-8 right-8 p-3 bg-slate-50 rounded-2xl"><X className="w-6 h-6 text-slate-400" /></button>
+            <button onClick={() => setSelectedStep(null)} className="absolute top-8 right-8 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all shadow-sm"><X className="w-6 h-6 text-slate-400" /></button>
             <div className="mb-8 font-black">
               <h3 className="text-3xl text-slate-800 tracking-tight">{agendaDetails[selectedStep].title}</h3>
               <p className="text-slate-400 text-sm italic">{agendaDetails[selectedStep].subtitle}</p>
             </div>
             <div className="space-y-3">
               {agendaDetails[selectedStep].checklists.map((item, i) => (
-                <div key={i} className="flex gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 group">
+                <div key={i} className="flex gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 group hover:border-blue-300 transition-all">
                   <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white flex-shrink-0" />
-                  <p className="text-sm font-bold text-slate-600 leading-relaxed">{item}</p>
+                  <p className="text-sm font-bold text-slate-600">{item}</p>
                 </div>
               ))}
             </div>
@@ -138,7 +137,7 @@ export default function SSAANavigator() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
             <h1 className="text-4xl font-black tracking-tighter text-slate-800 uppercase italic flex items-center gap-3">SSAA Navigator <Target className="w-8 h-8 text-blue-600" /></h1>
-            <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase tracking-widest">Judgment Prism Enabled</p>
+            <p className="text-slate-400 font-medium text-xs tracking-[0.3em] uppercase tracking-widest">Judgment Prism Console</p>
           </div>
           <div className="flex gap-3">
             <button onClick={takeSnapshot} className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold uppercase tracking-widest text-slate-600 hover:shadow-md transition-all"><Camera className="w-4 h-4" /> Snapshot</button>
@@ -177,7 +176,7 @@ export default function SSAANavigator() {
         <div className="lg:col-span-7 space-y-8">
           <div className="bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-sm h-[550px] relative overflow-hidden group">
             <h2 className="text-2xl font-black mb-10 text-slate-800 flex items-center gap-3 relative z-10"><Gavel className="w-6 h-6 text-blue-600" /> Momentum Orbit</h2>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] font-black text-6xl uppercase select-none transition-all">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] font-black text-6xl uppercase select-none group-hover:opacity-[0.05] transition-all">
               <div className="grid grid-cols-2 w-full h-full p-20">
                 <div className="flex items-start justify-start text-left">Pivot<br/><span className="text-[10px] lowercase font-medium tracking-normal text-slate-400">共感不足</span></div>
                 <div className="flex items-start justify-end text-right">Star<br/><span className="text-[10px] lowercase font-medium tracking-normal text-slate-400">集中投資</span></div>
@@ -224,18 +223,18 @@ export default function SSAANavigator() {
              <div className="grid grid-cols-2 gap-8 relative z-10">
                 <div onMouseEnter={() => setHoveredFramework('Keep')} onMouseLeave={() => setHoveredFramework(null)} className={`space-y-4 p-6 rounded-3xl border transition-all cursor-pointer ${hoveredFramework === 'Keep' ? 'bg-white/5 border-green-500/50 scale-[1.02]' : 'border-white/5'}`}>
                   <div className="flex justify-between items-center border-b border-white/10 pb-2"><div className="text-green-400 font-black text-[10px] uppercase">Keep: 継続・拡張</div><div className="bg-green-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{counts.keep} PJ</div></div>
-                  <p className="text-[11px] text-slate-400">ROIが高く、期限内でのビジョン到達が確実視されるプロジェクト。</p>
+                  <p className="text-[11px] text-slate-400 font-medium">反応が加速し、現場の行動密度が高い状態。リソースを維持・追加し、仕組み化を急ぐ。</p>
                 </div>
                 <div onMouseEnter={() => setHoveredFramework('Exit')} onMouseLeave={() => setHoveredFramework(null)} className={`space-y-4 p-6 rounded-3xl border transition-all cursor-pointer ${hoveredFramework === 'Exit' ? 'bg-white/5 border-red-500/50 scale-[1.02]' : 'border-white/5'}`}>
                   <div className="flex justify-between items-center border-b border-white/10 pb-2"><div className="text-red-400 font-black text-[10px] uppercase">Exit: 撤退・回収</div><div className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{counts.exit} PJ</div></div>
-                  <p className="text-[11px] text-slate-400">3ヶ月連続で速度が改善せず、投資効率が基準を下回るもの。</p>
+                  <p className="text-[11px] text-slate-400 font-medium">3ヶ月連続で速度が横ばい・低下。感情を排し、この事業から資源を他へ移転する。</p>
                 </div>
              </div>
           </div>
         </div>
 
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 flex items-center justify-between">
+          <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 border border-white/10 flex items-center justify-between">
             <h3 className="text-xs font-black uppercase tracking-widest flex items-center gap-2"><ListChecks className="w-4 h-4" /> Steering Agenda</h3>
             <div className="flex gap-2">
               {agendaDetails.map((_, i) => (
@@ -270,53 +269,66 @@ export default function SSAANavigator() {
 
                 {editingId === p.id ? (
                   <div className="pt-4 border-t border-slate-50 space-y-6 animate-in fade-in duration-300">
-                    {/* 1. スコア設定 */}
+                    {/* 1. スコア設定 (日本語化) */}
                     <div className="grid grid-cols-2 gap-x-6">
-                      <div><p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Strategic Sync</p>{['ssV', 'ssR', 'ssC'].map(k => renderSlider(k.replace('ss', ''), k))}</div>
-                      <div><p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Value Velocity</p>{['vvM', 'vvS', 'vvF'].map(k => renderSlider(k.replace('vv', ''), k))}</div>
+                      <div>
+                        <p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Strategic Sync</p>
+                        {renderSlider('ビジョン同期 (V)', 'ssV')}
+                        {renderSlider('現場共感 (R)', 'ssR')}
+                        {renderSlider('文脈適合 (C)', 'ssC')}
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-black text-slate-300 uppercase mb-3 border-b pb-1 tracking-widest">Value Velocity</p>
+                        {renderSlider('市場反応 (M)', 'vvM')}
+                        {renderSlider('開発速度 (S)', 'vvS')}
+                        {renderSlider('摩擦解消 (F)', 'vvF')}
+                      </div>
                     </div>
                     
                     {/* 2. 稼働設定 */}
                     <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                       <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">Work Hours (Monthly)</label><input type="number" value={tempScores.hours} onChange={e => setTempScores({...tempScores, hours: parseInt(e.target.value) || 0})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
-                       <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">Lead Person</label><input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
+                       <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">月間稼働時間 (Hours)</label><input type="number" value={tempScores.hours} onChange={e => setTempScores({...tempScores, hours: parseInt(e.target.value) || 0})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
+                       <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">主担当 (Lead Person)</label><input type="text" value={tempScores.lead} onChange={e => setTempScores({...tempScores, lead: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold outline-none" /></div>
                     </div>
 
-                    {/* 3. 業績管理 (黒背景) */}
+                    {/* 3. 業績管理セクション（黒背景・日本語化） */}
                     <div className="bg-slate-900 rounded-[2.5rem] p-6 space-y-6 text-white shadow-2xl relative border border-white/5">
+                      {/* 売上 */}
                       <div className="space-y-3">
-                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><BarChart3 className="w-3 h-3" /> 売上管理</p>
+                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><BarChart3 className="w-3 h-3" /> 売上管理 (月次)</p>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-white/5 p-3 rounded-2xl">
-                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">目標売上 (Target)</label>
+                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">売上目標 (Target)</label>
                             <input type="number" value={tempScores.tRev} onChange={e => setTempScores({...tempScores, tRev: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                           <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
-                            <label className="text-[8px] font-black text-blue-400 uppercase block mb-1">実績売上 (Actual)</label>
+                            <label className="text-[8px] font-black text-blue-400 uppercase block mb-1">売上実績 (Actual)</label>
                             <input type="number" value={tempScores.aRev} onChange={e => setTempScores({...tempScores, aRev: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                         </div>
                       </div>
 
+                      {/* 利益 */}
                       <div className="space-y-3">
-                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><Coins className="w-3 h-3" /> 利益管理</p>
+                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><Coins className="w-3 h-3" /> 利益管理 (月次)</p>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-white/5 p-3 rounded-2xl">
-                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">目標利益 (Target)</label>
+                            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">利益目標 (Target)</label>
                             <input type="number" value={tempScores.tProf} onChange={e => setTempScores({...tempScores, tProf: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                           <div className="bg-white/10 p-3 rounded-2xl border border-white/10">
-                            <label className="text-[8px] font-black text-emerald-400 uppercase block mb-1">実績利益 (Actual)</label>
+                            <label className="text-[8px] font-black text-emerald-400 uppercase block mb-1">利益実績 (Actual)</label>
                             <input type="number" value={tempScores.aProf} onChange={e => setTempScores({...tempScores, aProf: parseInt(e.target.value) || 0})} className="w-full bg-transparent text-sm font-black outline-none border-none p-0 focus:ring-0" />
                           </div>
                         </div>
                       </div>
 
-                      {/* 復活：KPIセクション */}
+                      {/* KPI管理 */}
                       <div className="space-y-3">
-                        <div className="flex items-center gap-2 border-b border-white/10 pb-1 mb-2">
-                           <LayoutDashboard className="w-3 h-3 text-amber-400" />
-                           <input type="text" value={tempScores.kpiName} onChange={e => setTempScores({...tempScores, kpiName: e.target.value})} className="bg-transparent text-[10px] font-black text-amber-400 uppercase outline-none w-full border-none p-0 focus:ring-0" placeholder="KPI項目名を入力" />
+                        <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-1 mb-2"><LayoutDashboard className="w-3 h-3" /> KPI管理</p>
+                        <div className="bg-white/5 p-3 rounded-2xl mb-2">
+                           <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">KPI項目名 (KPI Name)</label>
+                           <input type="text" value={tempScores.kpiName} onChange={e => setTempScores({...tempScores, kpiName: e.target.value})} className="bg-transparent text-[10px] font-black text-amber-400 uppercase outline-none w-full border-none p-0 focus:ring-0" placeholder="例: 新規商談数" />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-white/5 p-3 rounded-2xl">
@@ -330,12 +342,14 @@ export default function SSAANavigator() {
                         </div>
                       </div>
 
+                      {/* 審判期限 */}
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
                         <div><label className="text-[8px] font-black text-slate-500 uppercase block mb-1 tracking-widest">審判期限 (Deadline)</label><input type="date" value={tempScores.decisionDate} onChange={e => setTempScores({...tempScores, decisionDate: e.target.value})} className="w-full bg-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none border-none" /></div>
-                        <div><label className="text-[8px] font-black text-blue-400 uppercase block mb-1 tracking-widest">最終審判 (Verdict)</label><select value={tempScores.verdict} onChange={e => setTempScores({...tempScores, verdict: e.target.value})} className="w-full bg-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none border-none"><option value="Pending">Pending</option><option value="Scale-up">Scale-up</option><option value="Exit">Exit</option><option value="Archived">Archived</option></select></div>
+                        <div><label className="text-[8px] font-black text-blue-400 uppercase block mb-1 tracking-widest">最終審判 (Verdict)</label><select value={tempScores.verdict} onChange={e => setTempScores({...tempScores, verdict: e.target.value})} className="w-full bg-white/10 rounded-xl py-2 px-3 text-xs font-bold outline-none border-none focus:ring-0"><option value="Pending">Pending</option><option value="Scale-up">Scale-up</option><option value="Exit">Exit</option><option value="Archived">Archived</option></select></div>
                       </div>
                     </div>
 
+                    {/* 4. ステータスと洞察 */}
                     <div className="space-y-4 pt-2">
                        <div className="flex gap-2">{['Green', 'Yellow', 'Red'].map(s => ( <button key={s} onClick={() => setTempScores({...tempScores, status: s})} className={`flex-1 py-2 rounded-xl text-[10px] font-black border-2 transition-all ${tempScores.status === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-transparent border-slate-100 text-slate-300'}`}>{s}</button>))}</div>
                        <textarea value={tempScores.insight} onChange={e => setTempScores({...tempScores, insight: e.target.value})} className="w-full bg-slate-50 rounded-2xl p-4 text-[10px] font-bold outline-none h-24 border border-slate-100" placeholder="SSAA Insights: 現場の行動速度や摩擦に関する洞察を入力..." />
@@ -343,10 +357,11 @@ export default function SSAANavigator() {
                   </div>
                 ) : (
                   <div className="space-y-4">
+                    {/* 非編集時の表示セクション */}
                     <div className="grid grid-cols-2 gap-3 border-t pt-4 border-slate-50">
                       <div className="p-4 bg-slate-50 rounded-3xl">
-                        <div className="flex justify-between items-center mb-2 font-black"><span className="text-[9px] text-slate-400 uppercase tracking-widest flex items-center gap-1"><BarChart3 className="w-3 h-3" /> 売上進捗</span><span className="text-[10px] text-blue-600">{p.tRev > 0 ? Math.round((p.aRev / p.tRev) * 100) : 0}%</span></div>
-                        <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden mb-2"><div className="h-full bg-blue-500" style={{ width: `${Math.min((p.aRev / (p.tRev || 1)) * 100, 100)}%` }} /></div>
+                        <div className="flex justify-between items-center mb-2 font-black"><span className="text-[9px] text-slate-400 uppercase tracking-widest">売上進捗</span><span className="text-[10px] text-blue-600">{p.tRev > 0 ? Math.round((p.aRev / p.tRev) * 100) : 0}%</span></div>
+                        <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden mb-2"><div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((p.aRev / (p.tRev || 1)) * 100, 100)}%` }} /></div>
                         <p className="text-sm font-black text-slate-800 tracking-tight leading-none mt-1">¥{p.aRev.toLocaleString()}</p>
                       </div>
                       <div className="p-4 bg-blue-50/30 rounded-3xl border border-blue-50/50">

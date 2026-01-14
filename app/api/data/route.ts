@@ -33,24 +33,18 @@ export async function GET() {
     const settings: any = {};
     settingsRows.forEach(row => { settings[row.get('Key')] = row.get('Value'); });
 
-    const historyRows = await historySheetRows(doc);
-    return NextResponse.json({ projects, settings, history: historyRows });
-  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
-}
-
-async function historySheetRows(doc: any) {
-  try {
     const historySheet = doc.sheetsByTitle['History'];
-    const rows = await historySheet.getRows();
+    const hRows = await historySheet.getRows();
     const historyMap: any = {};
-    rows.forEach((row: any) => {
+    hRows.forEach(row => {
       historyMap[row.get('ProjectID')] = {
         x: ((Number(row.get('SS_Vision'))*0.4)+(Number(row.get('SS_Resonance'))*0.3)+(Number(row.get('SS_Context'))*0.3))*20,
         y: ((Number(row.get('VV_Market'))*0.4)+(Number(row.get('VV_Speed'))*0.4)+(Number(row.get('VV_Friction'))*0.2))*20
       };
     });
-    return historyMap;
-  } catch { return {}; }
+
+    return NextResponse.json({ projects, settings, history: historyMap });
+  } catch (error: any) { return NextResponse.json({ error: error.message }, { status: 500 }); }
 }
 
 export async function POST(req: Request) {
