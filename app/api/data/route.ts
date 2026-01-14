@@ -16,29 +16,26 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
     
-    // 1. Current Evaluations
+    // 1. 現状の評価取得
     const evalSheet = doc.sheetsByTitle['Evaluations'];
     const evalRows = await evalSheet.getRows();
     const projects = evalRows.map(row => ({
-      id: row.get('ProjectID'), 
-      name: row.get('ProjectName'),
+      id: row.get('ProjectID'), name: row.get('ProjectName'),
       ssV: Number(row.get('SS_Vision') || 0), ssR: Number(row.get('SS_Resonance') || 0), ssC: Number(row.get('SS_Context') || 0),
       vvM: Number(row.get('VV_Market') || 0), vvS: Number(row.get('VV_Speed') || 0), vvF: Number(row.get('VV_Friction') || 0),
       z: Number(row.get('Asset_Volume') || 50), lead: row.get('Lead_Person') || "未割当"
     }));
 
-    // 2. Settings
+    // 2. 設定取得
     const settingsSheet = doc.sheetsByTitle['Settings'];
     const settingsRows = await settingsSheet.getRows();
     const settings: any = {};
     settingsRows.forEach(row => { settings[row.get('Key')] = row.get('Value'); });
 
-    // 3. History Tracking (最新の履歴を1件取得)
+    // 3. 履歴取得（軌跡用）
     const historySheet = doc.sheetsByTitle['History'];
     const historyRows = await historySheet.getRows();
     const historyMap: any = {};
-    
-    // IDごとに最新の履歴を上書き保存していくことで、結果的に最後の一件が残る
     historyRows.forEach(row => {
       const pid = row.get('ProjectID');
       historyMap[pid] = {
@@ -54,39 +51,39 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { target, id, updates } = body;
+    const target = body.target as string;
     const auth = getAuth();
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, auth);
     await doc.loadInfo();
 
+    // Snapshot保存モード
     if (target === 'Snapshot') {
       const historySheet = doc.sheetsByTitle['History'];
       const evalSheet = doc.sheetsByTitle['Evaluations'];
       const rows = await evalSheet.getRows();
       const date = new Date().toLocaleDateString('ja-JP');
-      
       for (const row of rows) {
         await historySheet.addRow({
-          Date: date,
-          ProjectID: row.get('ProjectID'),
-          SS_Vision: row.get('SS_Vision'),
-          SS_Resonance: row.get('SS_Resonance'),
-          SS_Context: row.get('SS_Context'),
-          VV_Market: row.get('VV_Market'),
-          VV_Speed: row.get('VV_Speed'),
-          VV_Friction: row.get('VV_Friction'),
+          Date: date, ProjectID: row.get('ProjectID'),
+          SS_Vision: row.get('SS_Vision'), SS_Resonance: row.get('SS_Resonance'), SS_Context: row.get('SS_Context'),
+          VV_Market: row.get('VV_Market'), VV_Speed: row.get('VV_Speed'), VV_Friction: row.get('VV_Friction'),
           Asset_Volume: row.get('Asset_Volume')
         });
       }
       return NextResponse.json({ success: true });
     }
 
+    // 通常の更新（Evaluations または Settings）
     const sheet = doc.sheetsByTitle[target];
     const rows = await sheet.getRows();
     const searchKey = target === 'Evaluations' ? 'ProjectID' : 'Key';
-    const row = rows.find(r => r.get(searchKey) === id);
+    const row = rows.find(r => r.get(searchKey) === body.id);
+    
     if (row) {
-      Object.entries(updates).forEach(([k, v]) => row.set(k, v as any));
+      const updates = body.updates as Record<string, any>;
+      Object.entries(updates).forEach(([k, v]) => {
+        row.set(k, String(v)); // 型安全のため文字列としてセット
+      });
       await row.save();
     }
     return NextResponse.json({ success: true });
